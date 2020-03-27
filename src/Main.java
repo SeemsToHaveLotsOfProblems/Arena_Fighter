@@ -74,7 +74,8 @@ public class Main extends Application {
     static double strength = 1.0;
     static double endurance = 5.0;
     static double fatigue = 1.0;
-    static double determination = 1.5;
+    static double determination = 1.5; //Do not change determination stat!
+    static boolean detCheckSuccess = false;
 
     public static void main(String[] args){
         launch(args);
@@ -360,7 +361,6 @@ public class Main extends Application {
             //Removing stuff from grid
             grid.getChildren().removeAll(stats,strengthLabel,enduranceLabel,fatigueLabel,determinationLabel,
                     strTrain,endTrain,fatTrain,back);
-            //Call training menu
             trainingMenu("Strength", grid, stage);
         });
 
@@ -368,7 +368,6 @@ public class Main extends Application {
             //Removing stuff from grid
             grid.getChildren().removeAll(stats,strengthLabel,enduranceLabel,fatigueLabel,determinationLabel,
                     strTrain,endTrain,fatTrain,back);
-            //Call training menu
             trainingMenu("Endurance", grid, stage);
         });
 
@@ -376,8 +375,8 @@ public class Main extends Application {
             //Removing stuff from grid
             grid.getChildren().removeAll(stats,strengthLabel,enduranceLabel,fatigueLabel,determinationLabel,
                     strTrain,endTrain,fatTrain,back);
-            //Call training menu
-            trainingMenu("Fatigue", grid, stage);});
+            trainingMenu("Fatigue", grid, stage);
+        });
 
 
         back.setOnAction(e -> {
@@ -390,7 +389,7 @@ public class Main extends Application {
 
 
         return stage;
-    }
+    } //DONE!!!!
 
 
     public static void trainingMenu(String nameOfStat, GridPane grid, Stage stage){
@@ -445,22 +444,60 @@ public class Main extends Application {
         double finalCashToTrain = cashToTrain;
         int finalStatToTrain = statToTrain;
         train.setOnAction(b -> {
+            //Lambda variables
+            double statGains = 0;
+            String statName = "";
+
             if (cash >= finalCashToTrain){
                 //Should deduct the cash from player and boost stat by number returned from training method
                 cash -= finalCashToTrain;
 
                 if(finalStatToTrain == 1) {
                     //Strength
-                    strength += powerGain();
+                    statGains = powerGain();
+                    strength += statGains;
+                    statName = "strength";
                 } else if(finalStatToTrain == 2){
                     //Endurance
-                    endurance += powerGain();
+                    statGains = powerGain();
+                    endurance += statGains;
+                    statName = "endurance";
                 } else {
                     //Fatigue
-                    fatigue += powerGain();
+                    statGains = powerGain();
+                    fatigue += statGains;
+                    statName = "fatigue";
                 }
 
-                //Make label and show stat gains
+                //Labels & Buttons
+                Label statGainLabel = new Label("Congratulations your " + statName + " grew by " +
+                        statGains + " points!");
+                Label noStatGainsLabel = new Label("Your training failed!");
+                Label bonusStatGainLabel = new Label("You were determined in your training and gained twice the results!" );
+                Button nextTextButton = new Button("Next/End");
+
+                //Setting the layout
+                GridPane.setConstraints(bonusStatGainLabel, 1, 10);
+                GridPane.setConstraints(statGainLabel, 1, 10);
+                GridPane.setConstraints(noStatGainsLabel, 1, 10);
+                GridPane.setConstraints(nextTextButton, 2, 11);
+
+                //Showing stuff on screen
+                grid.getChildren().removeAll(train, backToTraining);
+
+                if(statGains == 0){
+                    grid.getChildren().addAll(noStatGainsLabel, nextTextButton);
+                } else if(detCheckSuccess){
+                    detCheckSuccess = false;
+                    grid.getChildren().addAll(bonusStatGainLabel, nextTextButton);
+                } else {
+                    grid.getChildren().addAll(statGainLabel, nextTextButton);
+                }
+
+                //Next/End text button function
+                nextTextButton.setOnAction(e -> {
+                    //Must find way to iterate through text
+                });
 
                 //Return to training menu
                 try {
@@ -471,6 +508,19 @@ public class Main extends Application {
 
             } else {
                 //Label should show not enough money and go back to training area.
+                Label notEnoughCash = new Label("You don't have enough money to do that!");
+                Button closeDialogue = new Button("Close");
+
+                GridPane.setConstraints(notEnoughCash, 1, 13);
+                GridPane.setConstraints(closeDialogue, 2, 14);
+
+                grid.getChildren().removeAll(train, backToTraining);
+                grid.getChildren().addAll(notEnoughCash, closeDialogue);
+
+                closeDialogue.setOnAction(e -> {
+                    grid.getChildren().removeAll(notEnoughCash, closeDialogue);
+                    grid.getChildren().addAll(train, backToTraining);
+                });
             }
         });
     }
@@ -484,10 +534,13 @@ public class Main extends Application {
 
 
     public static double powerGain(){
+        //Do not change determination stat!
         Random rand = new Random();
         int statGain = rand.nextInt(5);
-        if (determination + rand.nextInt((int)determination) >= 2.5){
+        double trainAgain = determination + rand.nextInt(2);
+        if (trainAgain >= 2.5){
             statGain += rand.nextInt(5);
+            detCheckSuccess = true;
         }
         return statGain;
     }
