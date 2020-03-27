@@ -74,7 +74,7 @@ public class Main extends Application {
     static double strength = 1.0;
     static double endurance = 5.0;
     static double fatigue = 1.0;
-    static double determination = 0.5;
+    static double determination = 1.5;
 
     public static void main(String[] args){
         launch(args);
@@ -395,12 +395,16 @@ public class Main extends Application {
 
     public static void trainingMenu(String nameOfStat, GridPane grid, Stage stage){
         //Variables
+        int statToTrain = 0; // 1 = Strength, 2 = Endurance, 3 = Fatigue
         double cashToTrain = 0.0;
         if(nameOfStat.toLowerCase().equals("strength")){
+            statToTrain = 1;
             cashToTrain = cashToTrain(strength);
         } else if(nameOfStat.toLowerCase().equals("endurance")){
+            statToTrain = 2;
             cashToTrain = cashToTrain(endurance);
         } else {
+            statToTrain = 3;
             cashToTrain = cashToTrain(fatigue);
         }
 
@@ -439,9 +443,32 @@ public class Main extends Application {
             }
         });
         double finalCashToTrain = cashToTrain;
+        int finalStatToTrain = statToTrain;
         train.setOnAction(b -> {
             if (cash >= finalCashToTrain){
                 //Should deduct the cash from player and boost stat by number returned from training method
+                cash -= finalCashToTrain;
+
+                if(finalStatToTrain == 1) {
+                    //Strength
+                    strength += powerGain();
+                } else if(finalStatToTrain == 2){
+                    //Endurance
+                    endurance += powerGain();
+                } else {
+                    //Fatigue
+                    fatigue += powerGain();
+                }
+
+                //Make label and show stat gains
+
+                //Return to training menu
+                try {
+                    trainingRoom(stage);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
             } else {
                 //Label should show not enough money and go back to training area.
             }
@@ -453,6 +480,16 @@ public class Main extends Application {
         Random rand = new Random();
         val = val * 2 + rand.nextInt((int)val);
         return val;
+    }
+
+
+    public static double powerGain(){
+        Random rand = new Random();
+        int statGain = rand.nextInt(5);
+        if (determination + rand.nextInt((int)determination) >= 2.5){
+            statGain += rand.nextInt(5);
+        }
+        return statGain;
     }
 
 
