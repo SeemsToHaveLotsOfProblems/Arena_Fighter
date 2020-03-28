@@ -555,6 +555,66 @@ public class Main extends Application {
         //Creating a Group object
         Group root = new Group(imageView);
 
+        //Creating a scene object
+        Scene scene = new Scene(root, 500, 450);
+
+        //Adding scene to the stage
+        stage.setScene(scene);
+
+        //Creating a grid
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10,10,10,10));
+        grid.setVgap(15.0);
+        grid.setHgap(10.0);
+
+        //Creating the labels
+        Label nameLabel = new Label("Name: " + pName);
+        Label cashLabel = new Label("Cash: $" + cash);
+        Label fameLabel = new Label("Number of fans: " + numFans);
+        Label fightsLabel = new Label("Number of Fights: " + numFights);
+        Label fightsWonLabel = new Label("Fights won: " + fightsWon);
+        Label fightsLostLabel = new Label("Fights Lost: " + fightsLost);
+        Label txtLabel = new Label("Which class do you wish to fight in?");
+
+        //Creating the buttons
+        Button beginnerClassButton = new Button("Beginner Class");
+        Button recognizedClassButton = new Button("Recognized Class");
+        Button fanFavoriteClassButton = new Button("Fan Favorites");
+        Button expertClassButton = new Button("Expert Class");
+        Button championClassButton = new Button("Champion Class");
+        Button backToWaitingArea = new Button("Back to waiting area");
+
+        //Positioning the labels & buttons
+        GridPane.setConstraints(nameLabel, 0,0);
+        GridPane.setConstraints(cashLabel, 1,0);
+        GridPane.setConstraints(fameLabel, 1,4);
+        GridPane.setConstraints(fightsLabel, 1,1);
+        GridPane.setConstraints(fightsWonLabel, 1,2);
+        GridPane.setConstraints(fightsLostLabel, 1,3);
+        GridPane.setConstraints(txtLabel, 0,1);
+        GridPane.setConstraints(beginnerClassButton, 0,2);
+        GridPane.setConstraints(recognizedClassButton, 0,3);
+        GridPane.setConstraints(fanFavoriteClassButton, 0,4);
+        GridPane.setConstraints(expertClassButton, 0,5);
+        GridPane.setConstraints(championClassButton, 0,6);
+        GridPane.setConstraints(backToWaitingArea, 0,7);
+
+        //Setting the grid
+        grid.getChildren().addAll(nameLabel,cashLabel,fameLabel,fightsLabel,fightsWonLabel,fightsLostLabel,
+                txtLabel,beginnerClassButton,recognizedClassButton,fanFavoriteClassButton,expertClassButton,
+                championClassButton,backToWaitingArea);
+
+        root.getChildren().add(grid);
+
+        //Button lambdas
+        backToWaitingArea.setOnAction(e -> {
+            try {
+                waitingRoom(stage);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
+
 
         return stage;
     }
