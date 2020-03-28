@@ -1,27 +1,18 @@
 import javafx.application.Application;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.Scene;
 
-import java.awt.*;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Random;
 
-import javafx.application.Application;
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.stage.Stage;
 
 
 public class Main extends Application {
@@ -167,7 +158,7 @@ public class Main extends Application {
     } //DONE!!!!!
 
 
-    public static Stage talkWithFans(Stage stage) throws FileNotFoundException{
+    public static void talkWithFans(Stage stage) throws FileNotFoundException{
         //Remember to change the image
         Image image = new Image(new FileInputStream("src/graphics/Arena_Fighter_fanArea.png"));
         ImageView imageView = new ImageView(image);
@@ -249,7 +240,6 @@ public class Main extends Application {
         });
 
 
-        return stage;
     } //DONE!!!!!
 
     public static String conversation(){
@@ -302,7 +292,7 @@ public class Main extends Application {
     } //TODO
 
 
-    public static Stage trainingRoom(Stage stage) throws FileNotFoundException{
+    public static void trainingRoom(Stage stage) throws FileNotFoundException{
         //Remember to change the image
         Image image = new Image(new FileInputStream("src/graphics/Arena_Fighter_mainArea.png"));
         ImageView imageView = new ImageView(image);
@@ -388,7 +378,6 @@ public class Main extends Application {
         });
 
 
-        return stage;
     } //DONE!!!!
 
 
@@ -547,7 +536,7 @@ public class Main extends Application {
     }
 
 
-    public static Stage arenaFighting(Stage stage) throws FileNotFoundException{
+    public static void arenaFighting(Stage stage) throws FileNotFoundException{
         //Remember to change the image
         Image image = new Image(new FileInputStream("src/graphics/Arena_Fighter_mainArea.png"));
         ImageView imageView = new ImageView(image);
@@ -615,8 +604,70 @@ public class Main extends Application {
             }
         });
 
+        beginnerClassButton.setOnAction(e -> fight(stage, 1));
 
-        return stage;
+        recognizedClassButton.setOnAction(e -> fight(stage, 2));
+
+        fanFavoriteClassButton.setOnAction(e -> fight(stage, 3));
+
+        expertClassButton.setOnAction(e -> fight(stage, 4));
+
+        championClassButton.setOnAction(e -> fight(stage, 5));
+
+
+    } //DONE!!!!
+
+
+    public static void fight(Stage stage, int fighterClass){
+        //This is where the actual fights are held.
+        /* fighterClass variable is used to determine which class the player chose.
+         * 1 - Beginner Class
+         * 2 - Recognized Class
+         * 3 - Fan Favorite Class
+         * 4 - Expert Class
+         * 5 - Champion Class
+         */
+        double playerHealth = healthMaker();
+        double opponentHealth = healthMaker(fighterClass);
+    }
+
+
+    public static double healthMaker(){
+        double health = 0;
+        Random rand = new Random();
+        for(int i = (int)fatigue + (int)endurance; i > 0; i -= rand.nextInt((int)fatigue + (int)endurance)){
+            health += i;
+        }
+        return health;
+    }
+    public static double healthMaker(int fClass){
+        double health = 0;
+        int opponentFatigue = 0;
+        int opponentEndurance = 0;
+
+        if(fClass == 1){
+            opponentEndurance = 3;
+            opponentFatigue = 1;
+        } else if(fClass == 2) {
+            opponentEndurance = 9;
+            opponentFatigue = 4;
+        } else if(fClass == 3) {
+            opponentEndurance = 15;
+            opponentFatigue = 10;
+        } else if(fClass == 4) {
+            opponentEndurance = 22;
+            opponentFatigue = 15;
+        } else {
+            opponentEndurance = 40;
+            opponentFatigue = 30;
+        }
+
+        Random rand = new Random();
+        for(int i = opponentFatigue + opponentEndurance; i > 0; i -= rand.nextInt(opponentFatigue + opponentEndurance)){
+            health += i;
+        }
+
+        return health;
     }
 
 
