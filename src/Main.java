@@ -31,7 +31,7 @@ public class Main extends Application {
      * Java and JavaFX.
      *
      * PROGRAM Info:
-     *  Main Window: DONE
+     *  Main Window:
      *      This window should show your characters name, gold, stats, number of fights, and fame.
      *      From this window you should be able to choose to "Fight in the Arena",
      *      "Train", or "Talk with fans."
@@ -41,7 +41,7 @@ public class Main extends Application {
      *          Strength (Your attack power)
      *          Endurance (Mix between Health and Defense)
      *          Fatigue (Stat is decreased for every continuous fight)
-     *          Determination (Special stat for randomly preventing Endurance drop)
+     *          Determination (Special stat for randomly preventing Endurance drop or boosting training results)
      *      The player may choose to train up any stat they wish at the cost of their gold.
      *
      *  Talk with fans Window:
@@ -485,21 +485,35 @@ public class Main extends Application {
                 //Showing stuff on screen
                 grid.getChildren().removeAll(train, backToTraining);
 
+                System.out.println("Reached just before if statement");
                 if(statGains == 0){
+                    System.out.println("Reached 0 stat gains");
                     grid.getChildren().addAll(noStatGainsLabel, nextTextButton);
-                } else if(detCheckSuccess){
+                } else if(detCheckSuccess && statGains > 0){
+                    System.out.println("Reached bonus stat gains");
                     detCheckSuccess = false;
                     grid.getChildren().addAll(bonusStatGainLabel, nextTextButton);
+                    nextTextButton.setOnAction(e -> {
+                        grid.getChildren().remove(bonusStatGainLabel);
+                        grid.getChildren().add(statGainLabel);
+                    });
                 } else {
+                    System.out.println("Reached normal stat gains");
                     grid.getChildren().addAll(statGainLabel, nextTextButton);
                 }
 
-                //Next/End text button function
                 nextTextButton.setOnAction(e -> {
-                    //Must find way to iterate through text
+                    grid.getChildren().removeAll(statGainLabel, noStatGainsLabel, nextTextButton);
+                    try {
+                        trainingRoom(stage);
+                    } catch (FileNotFoundException ex) {
+                        ex.printStackTrace();
+                    }
                 });
 
+
                 //Return to training menu
+                System.out.println("Intended return point");
                 try {
                     trainingRoom(stage);
                 } catch (FileNotFoundException e) {
