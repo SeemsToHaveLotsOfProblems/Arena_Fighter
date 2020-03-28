@@ -473,32 +473,28 @@ public class Main extends Application {
                 Label statGainLabel = new Label("Congratulations your " + statName + " grew by " +
                         statGains + " points!");
                 Label noStatGainsLabel = new Label("Your training failed!");
-                Label bonusStatGainLabel = new Label("You were determined in your training and gained twice the results!" );
+                Label bonusStatGainLabel = new Label("You were determined in your training and gained \n" +
+                        "twice the results! \n" + statName + " grew by " + statGains + " points!");
                 Button nextTextButton = new Button("Next/End");
 
                 //Setting the layout
-                GridPane.setConstraints(bonusStatGainLabel, 1, 10);
-                GridPane.setConstraints(statGainLabel, 1, 10);
-                GridPane.setConstraints(noStatGainsLabel, 1, 10);
-                GridPane.setConstraints(nextTextButton, 2, 11);
+                GridPane.setConstraints(bonusStatGainLabel, 0, 10);
+                GridPane.setConstraints(statGainLabel, 0, 10);
+                GridPane.setConstraints(noStatGainsLabel, 0, 10);
+                GridPane.setConstraints(nextTextButton, 1, 11);
 
                 //Showing stuff on screen
                 grid.getChildren().removeAll(train, backToTraining);
 
-                System.out.println("Reached just before if statement");
                 if(statGains == 0){
-                    System.out.println("Reached 0 stat gains");
                     grid.getChildren().addAll(noStatGainsLabel, nextTextButton);
                 } else if(detCheckSuccess && statGains > 0){
-                    System.out.println("Reached bonus stat gains");
                     detCheckSuccess = false;
                     grid.getChildren().addAll(bonusStatGainLabel, nextTextButton);
                     nextTextButton.setOnAction(e -> {
                         grid.getChildren().remove(bonusStatGainLabel);
-                        grid.getChildren().add(statGainLabel);
                     });
                 } else {
-                    System.out.println("Reached normal stat gains");
                     grid.getChildren().addAll(statGainLabel, nextTextButton);
                 }
 
@@ -510,15 +506,6 @@ public class Main extends Application {
                         ex.printStackTrace();
                     }
                 });
-
-
-                //Return to training menu
-                System.out.println("Intended return point");
-                try {
-                    trainingRoom(stage);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
 
             } else {
                 //Label should show not enough money and go back to training area.
@@ -537,7 +524,7 @@ public class Main extends Application {
                 });
             }
         });
-    }
+    } //DONE!!!!
 
 
     public static double cashToTrain(double val){
