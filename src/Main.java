@@ -773,6 +773,9 @@ public class Main extends Application {
         });//End attack button
 
         //Defend Button function
+        defendButton.setOnAction(e -> {
+
+        });//End defendButton
 
     }
 
