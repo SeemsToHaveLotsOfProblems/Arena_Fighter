@@ -712,6 +712,8 @@ public class Main extends Application {
             }//End damage check
 
             //Add critical check here
+            int critChance = rand.nextInt(10);
+            if(critChance == 7){damage *= 2;}
 
             int finalDamage = damage;
             opponentHealth.updateAndGet(v -> v - (finalDamage));
@@ -733,13 +735,16 @@ public class Main extends Application {
                 //Enemies turn
                 int eAttack = ((int)opponentStrength + rand.nextInt(((int) opponentStrength / 2) + 1) * 2);
                 int pBlocked = (((int)endurance / 2) + rand.nextInt(((int) endurance / 2) + 1));
-                int pDamage = attack - blocked;
+                int pDamage = eAttack - pBlocked;
                 if (pDamage <= 0){
                     pDamage = 0;
                     if(rand.nextInt(2) == 1){
                         pDamage = 1;
                     }
                 }//End opponent damage check
+
+                int eCritChance = rand.nextInt(10);
+                if(eCritChance == 7){pDamage *= 2;}
 
                 int finalDamage1 = pDamage;
                 playerHealth.updateAndGet(a -> (double) (a - finalDamage1));
@@ -763,16 +768,11 @@ public class Main extends Application {
                     }//End health check
             });//End nextTxtButton
 
-
             });//End Attack Button
-
-
-
 
         });//End attack button
 
-
-
+        //Defend Button function
 
     }
 
