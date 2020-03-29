@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.scene.Group;
 import javafx.scene.image.Image;
@@ -45,7 +46,6 @@ public class Main extends Application {
      *      grants a added bonus to your bet if you win.
      *      CLASSES:
      *          Beginner Class (Open to all, with a 10 gold entry fee.) * 2 bet & fame
-     *          Regular Class (Open to those with at least 3 fights under their belt. 7 gold entry fee) * 4 bet * fame
      *          Recognized Class (Open to those with 3 fights, and 10 fame.) * 7 bet & fame
      *          Fan Favorite Class (Open to those with 10 fights and 50 fame) * 10 bet & fame
      *          Expert Class (Open to those with 25 Strength) * 15 bet & fame
@@ -604,21 +604,66 @@ public class Main extends Application {
             }
         });
 
-        beginnerClassButton.setOnAction(e -> fight(stage, 1));
+        beginnerClassButton.setOnAction(e -> {
+            try {
+                fight(stage, 1, grid,nameLabel,cashLabel,fameLabel,fightsLabel,fightsWonLabel,fightsLostLabel,
+                        txtLabel,beginnerClassButton,recognizedClassButton,fanFavoriteClassButton,expertClassButton,
+                        championClassButton,backToWaitingArea);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
 
-        recognizedClassButton.setOnAction(e -> fight(stage, 2));
+        recognizedClassButton.setOnAction(e -> {
+            try {
+                fight(stage, 2, grid,nameLabel,cashLabel,fameLabel,fightsLabel,fightsWonLabel,fightsLostLabel,
+                        txtLabel,beginnerClassButton,recognizedClassButton,fanFavoriteClassButton,expertClassButton,
+                        championClassButton,backToWaitingArea);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
 
-        fanFavoriteClassButton.setOnAction(e -> fight(stage, 3));
+        fanFavoriteClassButton.setOnAction(e -> {
+            try {
+                fight(stage, 3, grid,nameLabel,cashLabel,fameLabel,fightsLabel,fightsWonLabel,fightsLostLabel,
+                        txtLabel,beginnerClassButton,recognizedClassButton,fanFavoriteClassButton,expertClassButton,
+                        championClassButton,backToWaitingArea);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
 
-        expertClassButton.setOnAction(e -> fight(stage, 4));
+        expertClassButton.setOnAction(e -> {
+            try {
+                fight(stage, 4, grid,nameLabel,cashLabel,fameLabel,fightsLabel,fightsWonLabel,fightsLostLabel,
+                        txtLabel,beginnerClassButton,recognizedClassButton,fanFavoriteClassButton,expertClassButton,
+                        championClassButton,backToWaitingArea);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
 
-        championClassButton.setOnAction(e -> fight(stage, 5));
+        championClassButton.setOnAction(e -> {
+            try {
+                fight(stage, 5, grid,nameLabel,cashLabel,fameLabel,fightsLabel,fightsWonLabel,fightsLostLabel,
+                        txtLabel,beginnerClassButton,recognizedClassButton,fanFavoriteClassButton,expertClassButton,
+                        championClassButton,backToWaitingArea);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
 
 
     } //DONE!!!!
 
 
-    public static void fight(Stage stage, int fighterClass){
+    public static void fight(Stage stage, int fighterClass, GridPane grid,
+                             Label nameLabel, Label cashLabel, Label fameLabel, Label fightsLabel,
+                             Label fightsWonLabel, Label fightsLostLabel,
+                             Label txtLabel, Button beginnerClassButton, Button recognizedClassButton,
+                             Button fanFavoriteClassButton, Button expertClassButton,
+                             Button championClassButton, Button backToWaitingArea) throws FileNotFoundException {
         //This is where the actual fights are held.
         /* fighterClass variable is used to determine which class the player chose.
          * 1 - Beginner Class
@@ -627,8 +672,108 @@ public class Main extends Application {
          * 4 - Expert Class
          * 5 - Champion Class
          */
-        double playerHealth = healthMaker();
-        double opponentHealth = healthMaker(fighterClass);
+
+        //Finding and setting player health & enemy stats
+        AtomicReference<Double> playerHealth = new AtomicReference<>(healthMaker());
+        String oName = namingTheEnemy();
+        double opponentStrength = findingEnemyStrength(fighterClass);
+        double opponentEndurance = findingEnemyEndurance(fighterClass);
+        AtomicReference<Double> opponentHealth = new AtomicReference<>(healthMaker(fighterClass, opponentStrength, opponentEndurance));
+
+        //Creating the labels and buttons
+        Label playerHealthLabel = new Label(pName + "'s HP: " + playerHealth);
+        Label opponentHealthLabel = new Label(oName + "'s HP: " + opponentHealth);
+        Button attackButton = new Button("Attack");
+        Button defendButton = new Button("Defend"); //Has small chance of counter attack
+
+        //Aligning the labels and buttons
+        GridPane.setConstraints(playerHealthLabel, 0, 0);
+        GridPane.setConstraints(opponentHealthLabel, 2, 0);
+        GridPane.setConstraints(attackButton, 0, 4);
+        GridPane.setConstraints(defendButton, 0, 5);
+
+        //Removing other crap and adding fighting stuff to the grid
+        grid.getChildren().removeAll(nameLabel,cashLabel,fameLabel,fightsLabel,fightsWonLabel,fightsLostLabel,
+                txtLabel,beginnerClassButton,recognizedClassButton,fanFavoriteClassButton,expertClassButton,
+                championClassButton,backToWaitingArea);
+        grid.getChildren().addAll(playerHealthLabel, opponentHealthLabel, attackButton, defendButton);
+
+        //The actual fighting stuff
+        Random rand = new Random();
+        attackButton.setOnAction(e -> {
+            int attack = ((int)strength + rand.nextInt(((int) strength / 2) + 1) * 2);
+            int blocked = (((int)opponentEndurance / 2) + rand.nextInt(((int) opponentEndurance / 2) + 1));
+            int damage = attack - blocked;
+            if (damage <= 0){
+                damage = 0;
+                if(rand.nextInt(2) == 1){
+                    damage = 1;
+                }
+            }//End damage check
+
+            //Add critical check here
+
+            int finalDamage = damage;
+            opponentHealth.updateAndGet(v -> v - (finalDamage));
+            opponentHealthLabel.setText(oName + "'s HP: " + opponentHealth);
+
+            //Making & placing the damage label
+            Label damageTakenLabel = new Label(oName + " took " + finalDamage + " damage!");
+            Button nextTxtButton = new Button("Close");
+            GridPane.setConstraints(damageTakenLabel, 1, 5);
+            GridPane.setConstraints(nextTxtButton, 1, 6);
+
+            //Show Damage
+            grid.getChildren().removeAll(attackButton, defendButton);
+            grid.getChildren().addAll(damageTakenLabel, nextTxtButton);
+
+            nextTxtButton.setOnAction(v -> {
+                grid.getChildren().removeAll(nextTxtButton, damageTakenLabel);
+
+                //Enemies turn
+                int eAttack = ((int)opponentStrength + rand.nextInt(((int) opponentStrength / 2) + 1) * 2);
+                int pBlocked = (((int)endurance / 2) + rand.nextInt(((int) endurance / 2) + 1));
+                int pDamage = attack - blocked;
+                if (pDamage <= 0){
+                    pDamage = 0;
+                    if(rand.nextInt(2) == 1){
+                        pDamage = 1;
+                    }
+                }//End opponent damage check
+
+                int finalDamage1 = pDamage;
+                playerHealth.updateAndGet(a -> (double) (a - finalDamage1));
+                playerHealthLabel.setText(pName + "'s HP: " + playerHealth);
+
+                Label playerTookDamage = new Label(pName + " took " + pDamage + " damage!");
+                Button nextTxt2Button = new Button("Close");
+                GridPane.setConstraints(playerTookDamage, 1, 5);
+                GridPane.setConstraints(nextTxt2Button, 1, 6);
+                grid.getChildren().addAll(playerTookDamage, nextTxt2Button);
+
+                //button function
+                nextTxt2Button.setOnAction(a -> {
+                    grid.getChildren().removeAll(nextTxt2Button, playerTookDamage);
+                    //Health check
+                    if(playerHealth.get() <= 0 || opponentHealth.get() <= 0){
+                        endingTheFight(playerHealth.get(), opponentHealth.get(), oName, grid, attackButton, defendButton,
+                                fighterClass, stage);
+                    } else{
+                        grid.getChildren().addAll(attackButton, defendButton);
+                    }//End health check
+            });//End nextTxtButton
+
+
+            });//End Attack Button
+
+
+
+
+        });//End attack button
+
+
+
+
     }
 
 
@@ -640,34 +785,95 @@ public class Main extends Application {
         }
         return health;
     }
-    public static double healthMaker(int fClass){
-        double health = 0;
-        int opponentFatigue = 0;
-        int opponentEndurance = 0;
-
-        if(fClass == 1){
-            opponentEndurance = 3;
-            opponentFatigue = 1;
-        } else if(fClass == 2) {
-            opponentEndurance = 9;
-            opponentFatigue = 4;
-        } else if(fClass == 3) {
-            opponentEndurance = 15;
-            opponentFatigue = 10;
-        } else if(fClass == 4) {
-            opponentEndurance = 22;
-            opponentFatigue = 15;
-        } else {
-            opponentEndurance = 40;
-            opponentFatigue = 30;
-        }
-
+    public static double healthMaker(int opponentClass, double opponentStrength, double opponentEndurance){
         Random rand = new Random();
-        for(int i = opponentFatigue + opponentEndurance; i > 0; i -= rand.nextInt(opponentFatigue + opponentEndurance)){
-            health += i;
+        double opponentHealth = 5;
+        for(int i = 0; i < opponentClass * 2; i++){
+            opponentHealth += rand.nextInt((int)opponentStrength + (int)opponentEndurance);
         }
 
-        return health;
+        return opponentHealth;
+    }
+
+
+    public static String namingTheEnemy(){
+        String[] possibleNames = {"John", "Glen", "Bob", "Glenda", "Robbert", "Frank", "Dick",
+        "Kyle", "Earl", "Bill", "Derek", "Hank", "Luke", "Dillard", "Jake", "Sally", "Dainty",
+        "Desmond"};
+
+        String nameToReturn = "";
+        Random rand = new Random();
+        nameToReturn = possibleNames[rand.nextInt(possibleNames.length - 1)];
+
+        return nameToReturn;
+    }
+
+
+    public static double findingEnemyStrength(int opponentClass){
+        Random rand = new Random();
+        double opponentStrength = 1;
+        int trainingTimes = opponentClass * 2;
+        for(int i = 0; i < trainingTimes; i++){
+            opponentStrength += rand.nextInt(5) + 1;
+        }//End for loop
+        return opponentStrength;
+    }
+
+
+    public static double findingEnemyEndurance(int opponentClass){
+        Random rand = new Random();
+        double opponentEndurance = 1;
+        int trainingTimes = opponentClass * 2;
+        for(int i = 0; i < trainingTimes; i++){
+            opponentEndurance += rand.nextInt(5) + 1;
+        }//End for loop
+        return opponentEndurance;
+    }
+
+
+    public static void endingTheFight(double playerHealth, double opponentHealth, String oName, GridPane grid,
+                                      Button attackButton, Button defendButton, int fighterClass, Stage stage){
+        //Find winner and set name to deadGuy variable
+        String deadGuy = "";
+        if(playerHealth <= 0){deadGuy = pName;}
+        if(opponentHealth <= 0){deadGuy = oName;}
+
+        Label fightWinner = new Label(deadGuy + "'s HP has reached 0! \nThe fight is over!");
+        GridPane.setConstraints(fightWinner, 2, 5);
+        Button endFight = new Button("Close");
+        GridPane.setConstraints(endFight, 2, 6);
+        grid.getChildren().removeAll(attackButton, defendButton);
+        grid.getChildren().addAll(fightWinner, endFight);
+
+        //Add to player win/lose count
+        if(playerHealth > 0){
+            fightsWon += 1;
+        } else {
+            fightsLost += 1;
+        }
+        numFights += 1;
+
+        //Giving cash
+        if(fighterClass == 1){
+            cash += 10;
+        } else if(fighterClass == 2) {
+            cash += 20;
+        } else if(fighterClass == 3) {
+            cash += 40;
+        } else if(fighterClass == 4) {
+            cash += 80;
+        } else {
+            cash += 160;
+        }
+
+        //End fight
+        endFight.setOnAction(a -> {
+            try {
+                arenaFighting(stage);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
 
