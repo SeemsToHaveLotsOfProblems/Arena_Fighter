@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Arena_Fighter:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Arena_Fighter_jar</output-path>
+    <root id="archive" name="Arena_Fighter.jar">
+      <element id="module-output" name="Arena_Fighter" />
+    </root>
+  </artifact>
+</component>
