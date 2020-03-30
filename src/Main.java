@@ -766,7 +766,7 @@ public class Main extends Application {
                     } else{
                         grid.getChildren().addAll(attackButton, defendButton);
                     }//End health check
-            });//End nextTxtButton
+                });//End nextTxtButton
 
             });//End Attack Button
 
@@ -774,6 +774,73 @@ public class Main extends Application {
 
         //Defend Button function
         defendButton.setOnAction(e -> {
+            //Enemies turn
+            int eAttack = ((int)opponentStrength + rand.nextInt(((int) opponentStrength / 2) + 1) * 2);
+            int pBlocked = ((((int)endurance / 2) + rand.nextInt(((int) endurance / 2) + 1)) * 2);
+            int pDamage = eAttack - pBlocked;
+            if (pDamage <= 0){
+                pDamage = 0;
+                if(rand.nextInt(2) == 1){
+                    pDamage = 1;
+                }
+            }//End opponent damage check
+
+            int counterAttack = rand.nextInt(10);
+            if(counterAttack == 7){
+                //Add enemy damage here
+                int pAttack = ((int)strength + rand.nextInt(((int)strength / 2) + 1) * 2);
+                int eDamage = pAttack;
+
+                //Creating labels & updating health
+                Button nextTxt2Button = new Button("Close");
+                Label counterAttackLabel = new Label(pName + " countered the attack! \n" + oName + " took " +
+                        eDamage + " damage!");
+                opponentHealth.updateAndGet(a -> (a - eDamage));
+                opponentHealthLabel.setText(oName + "'s HP: " + opponentHealth);
+
+                //Placing the label & button
+                GridPane.setConstraints(counterAttackLabel, 1, 5);
+                GridPane.setConstraints(nextTxt2Button, 1, 6);
+
+                grid.getChildren().removeAll(attackButton, defendButton);
+                grid.getChildren().addAll(counterAttackLabel, nextTxt2Button);
+
+                nextTxt2Button.setOnAction(a -> {
+                    grid.getChildren().removeAll(nextTxt2Button, counterAttackLabel);
+                    //Health check
+                    if(playerHealth.get() <= 0 || opponentHealth.get() <= 0){
+                        endingTheFight(playerHealth.get(), opponentHealth.get(), oName, grid, attackButton, defendButton,
+                                fighterClass, stage);
+                    } else{
+                        grid.getChildren().addAll(attackButton, defendButton);
+                    }//End health check
+                });//End nextTxtButton
+
+
+            } else {
+                int finalDamage1 = pDamage;
+                playerHealth.updateAndGet(a -> (double) (a - finalDamage1));
+                playerHealthLabel.setText(pName + "'s HP: " + playerHealth);
+
+                Label playerTookDamage = new Label(pName + " took " + pDamage + " damage!");
+                Button nextTxt2Button = new Button("Close");
+                GridPane.setConstraints(playerTookDamage, 1, 5);
+                GridPane.setConstraints(nextTxt2Button, 1, 6);
+
+                grid.getChildren().removeAll(attackButton, defendButton);
+                grid.getChildren().addAll(playerTookDamage, nextTxt2Button);
+
+                nextTxt2Button.setOnAction(a -> {
+                    grid.getChildren().removeAll(nextTxt2Button, playerTookDamage);
+                    //Health check
+                    if(playerHealth.get() <= 0 || opponentHealth.get() <= 0){
+                        endingTheFight(playerHealth.get(), opponentHealth.get(), oName, grid, attackButton, defendButton,
+                                fighterClass, stage);
+                    } else{
+                        grid.getChildren().addAll(attackButton, defendButton);
+                    }//End health check
+                });//End nextTxtButton
+            }//End if/else statement
 
         });//End defendButton
 
