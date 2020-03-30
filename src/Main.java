@@ -103,6 +103,11 @@ public class Main extends Application {
         //Adding scene to the stage
         stage.setScene(scene);
 
+        //Finding fans
+        Random randFans = new Random();
+        numFans = (fightsWon * randFans.nextInt(5)) - (fightsLost / 2);
+        if (numFans < 0){numFans = 0;}
+
         //Buttons
         Button arena = new Button("Fight in the Arena");
         Button training = new Button("Training");
@@ -258,39 +263,61 @@ public class Main extends Application {
         } else if(numFans < 10) {
             num = rand.nextInt(4);
             if(num ==1){
-                convo = "I think I've seen you fighting. Good luck out there!";
+                convo = "I think I've seen you fighting. \nGood luck out there!";
             } else if(num == 2) {
                 convo = "Who're you, a fighter?";
             } else if(num == 3) {
-                convo = "Oh I know you, you're the new guy! I'm rooting for you!";
+                convo = "Oh I know you, you're the new guy! \nI'm rooting for you!";
             } else {
                 convo = "The people who fight in the arena are so cool!";
             }
         } else if(numFans < 20) {
             num = rand.nextInt(4);
             if(num ==1){
-                convo = "I think I've seen you fighting. Good luck out there!";
+                convo = "Oh, " + pName + ", you're my favorite \nup and comer! ";
+            } else if(num == 2) {
+                convo = "It's really cool to meet you, " + pName + "!";
+            } else if(num == 3) {
+                convo = "I'm rooting for you out there!";
+            } else {
+                convo = pName + ", I've put money on your next fight, \nso don't let me down, ok!";
             }
         } else if(numFans < 40) {
             num = rand.nextInt(4);
             if(num ==1){
-                convo = "I think I've seen you fighting. Good luck out there!";
+                convo = "If only I could fight as well as you!";
+            } else if(num == 2) {
+                convo = "Your fights always entertain me!";
+            } else if(num == 3) {
+                convo = "Wow, I can't believe I met you!";
+            } else {
+                convo = "The people who fight in the \narena are so cool!";
             }
         } else if(numFans < 80) {
             num = rand.nextInt(4);
             if(num ==1){
-                convo = "I think I've seen you fighting. Good luck out there!";
+                convo = "You're one of the best \nfighters out there!";
+            } else if(num == 2) {
+                convo = "It's so cool that you still take \ntime to talk with your fans!";
+            } else if(num == 3) {
+                convo = "I cannot believe that \nI've met you!";
+            } else {
+                convo = "I bet all my money on you every time! \n...Please don't lose anymore.";
             }
         } else if(numFans <= 100) {
             num = rand.nextInt(4);
             if(num ==1){
-                convo = "I think I've seen you fighting. Good luck out there!";
+                convo = "Wow, one of the Arena's \nelite is talking to me!";
+            } else if(num == 2) {
+                convo = "You are the best, of the best, \nof the best, sir!";
+            } else if(num == 3) {
+                convo = "Oh I know you, you're the new guy! \nI'm rooting for you!\n"+
+                "Only joking, we all know and love you!";
+            } else {
+                convo = "I just know you'll be champion!";
             }
         } else {
-            num = rand.nextInt(4);
-            if(num ==1){
-                convo = "I think I've seen you fighting. Good luck out there!";
-            }
+            convo = "Wow, the champion! \nIt's an honor to meet you!";
         }
 
         return convo;
@@ -907,19 +934,23 @@ public class Main extends Application {
 
 
     public static void endingTheFight(double playerHealth, double opponentHealth, String oName, GridPane grid,
-                                      Button attackButton, Button defendButton, int fighterClass, Stage stage){
+                                      Button attackButton, Button defendButton, int fighterClass, Stage stage) {
         //Variables I need
         boolean winFight = false;
         AtomicBoolean champion = new AtomicBoolean(false);
 
-        if(fighterClass == 5 && playerHealth > 0){
+        if (fighterClass == 5 && playerHealth > 0) {
             champion.set(true);
         }
 
         //Find winner and set name to deadGuy variable
         String deadGuy = "";
-        if(playerHealth <= 0){deadGuy = pName;}
-        if(opponentHealth <= 0){deadGuy = oName;}
+        if (playerHealth <= 0) {
+            deadGuy = pName;
+        }
+        if (opponentHealth <= 0) {
+            deadGuy = oName;
+        }
 
         Label fightWinner = new Label(deadGuy + "'s HP has reached 0! \nThe fight is over!");
         GridPane.setConstraints(fightWinner, 2, 5);
@@ -929,7 +960,10 @@ public class Main extends Application {
         grid.getChildren().addAll(fightWinner, endFight);
 
         //Add to player win/lose count
-        if(playerHealth > 0){
+        if(playerHealth <= 0 && opponentHealth <= 0){
+            fightsWon += 1;
+            winFight = true;
+        } else if(playerHealth > 0){
             fightsWon += 1;
             winFight = true;
         } else {
