@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.scene.Group;
@@ -51,6 +52,10 @@ public class Main extends Application {
      *          Expert Class (Open to those with 25 Strength) * 15 bet & fame
      *          Champion Class (Open to those with 30 Str, 5 Det, 20 Fights, and 100 Fame) * 20 bet & fame
      *
+     */
+
+    /* TODO:
+     *   Add talk with fan dialogue
      */
 
     //Global Variables
@@ -289,7 +294,7 @@ public class Main extends Application {
         }
 
         return convo;
-    } //TODO
+    }
 
 
     public static void trainingRoom(Stage stage) throws FileNotFoundException{
@@ -903,6 +908,14 @@ public class Main extends Application {
 
     public static void endingTheFight(double playerHealth, double opponentHealth, String oName, GridPane grid,
                                       Button attackButton, Button defendButton, int fighterClass, Stage stage){
+        //Variables I need
+        boolean winFight = false;
+        AtomicBoolean champion = new AtomicBoolean(false);
+
+        if(fighterClass == 5 && playerHealth > 0){
+            champion.set(true);
+        }
+
         //Find winner and set name to deadGuy variable
         String deadGuy = "";
         if(playerHealth <= 0){deadGuy = pName;}
@@ -918,6 +931,7 @@ public class Main extends Application {
         //Add to player win/lose count
         if(playerHealth > 0){
             fightsWon += 1;
+            winFight = true;
         } else {
             fightsLost += 1;
         }
@@ -925,18 +939,64 @@ public class Main extends Application {
 
         //Giving cash
         if(fighterClass == 1){
-            cash += 10;
+            if(winFight){
+                cash += 20;
+            } else {
+                cash =+ 10;
+            }
         } else if(fighterClass == 2) {
-            cash += 20;
+            if(winFight){
+                cash += 40;
+            } else {
+                cash =+ 20;
+            }
         } else if(fighterClass == 3) {
-            cash += 40;
+            if(winFight){
+                cash += 80;
+            } else {
+                cash =+ 40;
+            }
         } else if(fighterClass == 4) {
-            cash += 80;
+            if(winFight){
+                cash += 160;
+            } else {
+                cash =+ 80;
+            }
         } else {
-            cash += 160;
+            if(winFight){
+                cash += 320;
+            } else {
+                cash =+ 160;
+            }
         }
 
+        if(champion.get()){
+            //Add thank you for playing and a credit here
+            Label thankYou = new Label("You are the Arena Fighter Champion!\n" +
+                    "Thank you so much for playing!\n" +
+                    "Game code & graphics by FatalErrorDriveB");
+            Button closeCredits = new Button("Close");
+
+            //Setting the position
+            GridPane.setConstraints(thankYou, 1, 5);
+            GridPane.setConstraints(closeCredits, 1, 6);
+
+            //Setting the grid
+            grid.getChildren().removeAll(fightWinner,endFight);
+            grid.getChildren().addAll(thankYou, closeCredits);
+
+            closeCredits.setOnAction(e -> {
+                champion.set(false);
+                try {
+                    arenaFighting(stage);
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            });
+        }//End credits
+
         //End fight
+        winFight = false;
         endFight.setOnAction(a -> {
             try {
                 arenaFighting(stage);
